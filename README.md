@@ -9,7 +9,7 @@ Mini sistema de ventas para una distribuidora: login con roles, catálogo, mas d
 | Aplicación (frontend en Vercel) | https://ventaslite.vercel.app |
 | API (backend en Railway) | https://ventaslite-production.up.railway.app/api |
 | Video (3 a 5 min) | https://www.loom.com/share/0d2af3b5f8ba4c3ca3b383d969486e58 |
-| Wireframe | `docs/` y [enlace de Figma con acceso de lectura] | https://www.figma.com/make/sWvTSSvk36g0yk24UuNZr8/Wireframe-de-Ventas?t=kjbXS2dvReyCsPxO-1
+| Wireframe | `docs/` y enlace de Figma | https://www.figma.com/make/sWvTSSvk36g0yk24UuNZr8/Wireframe-de-Ventas?t=kjbXS2dvReyCsPxO-1
 
 ### Credenciales de prueba
 
@@ -121,3 +121,11 @@ Seis tablas con migraciones, llaves foráneas reales e índices: `users`, `branc
 ## Uso de IA
 
 La bitácora de prompts, errores y correcciones está en [`AI_LOG.md`](AI_LOG.md).
+
+## Pruebas automatizadas
+
+```bash
+php artisan test
+```
+
+Cubren: cálculo de IVA y descuento de stock, venta sin stock, cancelación (solo admin, regresa el stock), reportes sin ventas canceladas, alcance por rol del vendedor y bloqueo del login tras 5 intentos. Corren en SQLite en memoria, sin tocar la base de datos de desarrollo.
