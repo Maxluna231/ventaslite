@@ -8,7 +8,7 @@ Mini sistema de ventas para una distribuidora: login con roles, catálogo, mas d
 |---|---|
 | Aplicación (frontend en Vercel) | https://ventaslite.vercel.app |
 | API (backend en Railway) | https://ventaslite-production.up.railway.app/api |
-| Video (3 a 5 min) | [enlace al video] |
+| Video (3 a 5 min) | https://www.loom.com/share/0d2af3b5f8ba4c3ca3b383d969486e58 |
 | Wireframe | `docs/` y [enlace de Figma con acceso de lectura] | https://www.figma.com/make/sWvTSSvk36g0yk24UuNZr8/Wireframe-de-Ventas?t=kjbXS2dvReyCsPxO-1
 
 ### Credenciales de prueba
