@@ -6,6 +6,9 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\CatalogController;
+
+
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -29,6 +32,12 @@ Route::middleware('auth:sanctum')->group(function () {
     //IA
     Route::post('/ai/ask', [AiController::class, 'ask'])->middleware('throttle:20,1');
     Route::post('/ai/summary', [AiController::class, 'summary'])->middleware('throttle:20,1');
+
+    //catalog controller
+    Route::get('/branches', [CatalogController::class, 'branches']);
+    Route::get('/sellers', [CatalogController::class, 'sellers']);
+    Route::get('/products', [CatalogController::class, 'products']);
+
 });
 
 Route::get('/user', function (Request $request) {
