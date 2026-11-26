@@ -1,58 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# VentasLite
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Mini sistema de ventas para una distribuidora: login con roles, catálogo, mas de 2,000 ventas sembradas, reportes con SQL agregado y un asistente de IA.
 
-## About Laravel
+## Demo en línea
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Parte | URL |
+|---|---|
+| Aplicación (frontend en Vercel) | https://ventaslite.vercel.app |
+| API (backend en Railway) | https://ventaslite-production.up.railway.app/api |
+| Video (3 a 5 min) | [enlace al video] |
+| Wireframe | `docs/` y [enlace de Figma con acceso de lectura] | https://www.figma.com/make/sWvTSSvk36g0yk24UuNZr8/Wireframe-de-Ventas?t=kjbXS2dvReyCsPxO-1
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Credenciales de prueba
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Administrador | `admin@ventaslite.test` | `password` |
+| Vendedor | `vendedor1@ventaslite.test` a `vendedor8@ventaslite.test` | `password` |
 
-## Learning Laravel
+## Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Frontend:** React 19 + Vite, Tailwind CSS, React Router, Recharts.
+- **Backend:** PHP 8.4, Laravel 13, API REST en JSON, Sanctum (token Bearer).
+- **Base de datos:** MySQL 8.
+- **IA:** Gemini (Google), llamado siempre desde el backend.
+- **Despliegue:** Vercel (frontend) y Railway (backend + MySQL).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Estructura del repositorio
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+ventaslite/
+├── app/, routes/, database/, config/   → backend Laravel (se despliega en Railway)
+├── frontend/                           → React + Vite (se despliega en Vercel)
+└── docs/                               → wireframe y capturas
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+El `package.json` de la raíz es el de la plantilla de Laravel y no se usa. El frontend es el de `frontend/`.
 
-## Contributing
+## Requisitos
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+PHP 8.4+, Composer, Node.js 20+, MySQL 8 (o MariaDB) y una API key de Gemini (opcional: sin ella la app funciona y el asistente muestra un aviso).
 
-## Code of Conduct
+## Instalación local 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+git clone https://github.com/maxluna231/ventaslite.git && cd ventaslite
+composer install
+cp .env.example .env && php artisan key:generate
+mysql -u root -e "CREATE DATABASE ventaslite CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+php artisan migrate:fresh --seed
+php artisan serve
+cd frontend && cp .env.example .env && npm install
+npm run dev
+```
 
-## Security Vulnerabilities
+Antes de `migrate:fresh --seed`, revisa en `.env` los datos de MySQL (`DB_USERNAME`, `DB_PASSWORD`) y, si quieres el asistente, pon `AI_API_KEY`. La app queda en http://localhost:5173 y la API en http://localhost:8000.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+## Variables de entorno
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Ningún secreto está en el repositorio. Ver `.env.example` y `frontend/.env.example`.
+
+| Variable | Dónde | Para qué |
+|---|---|---|
+| `DB_*` | Backend | Conexión a MySQL |
+| `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL` | Backend | Proveedor, key y modelo del asistente (`gemini`) |
+| `CORS_ALLOWED_ORIGINS` | Backend | 
+| `VITE_API_URL` | Frontend | Base de la API (`/api` en producción) |
+| `VITE_AI_URL` | Frontend | Base directa de la API para el asistente |
+
+## Funcionalidades
+
+- **Login y roles:** token Sanctum, logout que invalida el token, bloqueo tras 5 intentos fallidos por minuto. El vendedor solo ve y reporta sus propias ventas, validado en el backend.
+- **Ventas:** listado paginado en servidor (20 por página) con filtros de fechas, sucursal, vendedor y estatus; detalle; registrar venta (descuenta stock en una transaccion); cancelar (solo admin, regresa el stock).
+- **Reportes** (SQL agregado en el backend, las ventas canceladas no cuentan): dashboard con cambio contra el periodo anterior, ventas por mes (12 meses), top 10 de productos por unidades o importe, ranking de vendedores, sucursal × categoría, margen por categoria y exportación a CSV.
+- **Asistente de IA:** pregunta libre y "Resumen ejecutivo" sobre el periodo filtrado.
+
+## Modelo de datos
+
+Seis tablas con migraciones, llaves foráneas reales e índices: `users`, `branches`, `categories`, `products`, `sales` (índices en `sold_at`, `branch_id + sold_at`, `user_id + sold_at`) y `sale_items` (cascade desde `sales`).
+
+## Datos sembrados
+
+1 admin y 8 vendedores, 4 sucursales, 8 categorías, 150 productos (10 % inactivos), 2,500 ventas de los últimos 18 meses (≈5 % canceladas) y unos 7,500 renglones. Diciembre vende cerca del doble que los demás meses y la sucursal Sureste queda claramente por debajo. Los totales cuadran: `total = suma de renglones × 1.16`.
+
+## Decisiones técnicas
+
+- **Dinero:** `DECIMAL(12,2)`, nunca `FLOAT`; los cálculos se hacen en centavos enteros y se convierten al final.
+- **`unit_price` en `sale_items`:** el precio del producto puede cambiar despues.
+- **Cálculo en el servidor:** el cliente solo manda producto y cantidad; precios, IVA y total salen de la base. La vista previa del formulario es solo para visualizar.
+- **Concurrencia:** el registro de ventas bloquea las filas de producto (`lockForUpdate`, en orden de id) dentro de una transacción.
+- **Seeders rápidos e idempotentes:** inserciones por lote en una transacción; catálogos con `firstOrCreate`.
+- **Nombres:** Faker no incluye `es_MX`, asi que se usó `es_ES`.
+- **Reportes:** todos parten de una sola consulta base que excluye canceladas y aplica el alcance por rol. La tabla sucursal × categoría incluye sucursales y categorías sin ventas (con 0).
+- **Periodo por defecto:** si no se eligen fechas, los últimos 30 dias. "Ventas por mes" siempre muestra los ultimos 12 meses y solo respeta sucursal y rol.
+- **Importes:** los totales de ventas incluyen IVA; sucursal × categoría, top de productos y margen usan importes sin IVA.
+- **CSV:** se genera reutilizando los mismos reportes (mismos filtros y mismo alcance por rol), con BOM UTF-8 para que Excel muestre bien los acentos.
+
+## Asistente de IA
+
+- El frontend nunca llama al modelo directamente: pasa por el backend.
+- El backend arma el contexto con **datos agregados** (resumen, sucursales, vendedores, margen), nunca con tablas completas, y respeta el rol del usuario.
+- **El modelo no genera SQL ni se ejecuta nada que provenga de él.** Todas las consultas son fijas y parametrizadas, así que no hay superficie de inyección y no hizo falta una lista blanca. El prompt de sistema además le prohíbe generar consultas o cambiar sus reglas.
+- Si no hay key o el proveedor falla o está saturado, la app sigue funcionando y muestra un mensaje en español (HTTP 503).
+
+
+## Despliegue
+
+- **Backend en Railway:** servicio de GitHub mas un servicio MySQL. Variables de entorno configuradas en Railway. Comando de inicio: `php artisan migrate --force && php -S 0.0.0.0:$PORT -t public`.
+- **Frontend en Vercel:** carpeta raíz `frontend`. `frontend/vercel.json` reenvía `/api/*` a Railway (así el navegador solo habla con Vercel y no hay CORS) y redirige el resto a `index.html`.
+- **Asistente:** llama directo a Railway (`VITE_AI_URL`), porque Vercel corta los reenvíos de más de ~30 s y Gemini puede tardar más.
+
+## Limitaciones conocidas y pendientes
+
+- El servidor de Railway usa el servidor integrado de PHP (`php -S`), que atiende una petición a la vez; es suficiente para la prueba, no para producción real.
+- Railway tiene un modo de protección ("Under Attack Mode") que bloquea la API con una verificación de navegador; debe permanecer desactivado.
+- Gemini en plan gratuito puede responder "saturado" (503) en horas pico y el asistente tarda entre 15 y 40 s.
+- **Pendiente:** mensajes de validación del backend en español, nombres de productos más realistas, caché de reportes, pruebas automatizadas (PHPUnit/Pest), Docker Compose y modo oscuro.
+
+## Uso de IA
+
+La bitácora de prompts, errores y correcciones está en [`AI_LOG.md`](AI_LOG.md).

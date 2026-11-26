@@ -16,7 +16,7 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $key = 'login:' . strtolower($data['email']) . '|' . $request->ip();
+    $key = 'login:' . strtolower($data['email']);
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
