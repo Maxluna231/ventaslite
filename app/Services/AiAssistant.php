@@ -35,13 +35,11 @@ class AiAssistant
                 'anterior' => $dashboard['previous'],
                 'cambio_porcentual' => $dashboard['change_percent'],
             ],
-            'ventas_por_mes' => $reports->monthly($request)->getData(true),
             'ventas_por_sucursal_sin_iva' => array_map(
                 fn ($r) => ['sucursal' => $r['branch'], 'importe' => $r['total']],
                 $branchCategory['rows']
             ),
             'vendedores' => $reports->sellers($request)->getData(true),
-            'top_productos' => $reports->topProducts($request)->getData(true),
             'margen_por_categoria' => $reports->margin($request)->getData(true),
         ];
     }
@@ -55,7 +53,7 @@ class AiAssistant
 
         $provider = config('services.ai.provider');
         $model = config('services.ai.model')
-             ?: ($provider === 'gemini' ? 'gemini-3.5-flash' : 'claude-haiku-5-5');
+            ?: ($provider === 'gemini' ? 'gemini-3.5-flash' : 'claude-haiku-5-5');
 
         $userText = "DATOS (JSON):\n" . json_encode($context, JSON_UNESCAPED_UNICODE)
             . "\n\nSOLICITUD:\n" . $instruction;
@@ -68,7 +66,10 @@ class AiAssistant
                 [
                     'systemInstruction' => ['parts' => [['text' => self::SYSTEM]]],
                     'contents' => [['role' => 'user', 'parts' => [['text' => $userText]]]],
-                    'generationConfig' => ['maxOutputTokens' => 2048],
+                    'generationConfig' => [
+                        'maxOutputTokens' => 1024,
+                        'thinkingConfig' => ['thinkingBudget' => 0],
+                    ],
                 ]
             ),
             default => $http->withHeaders([
@@ -83,8 +84,19 @@ class AiAssistant
         };
 
         if ($response->failed()) {
-            Log::warning('Falla del proveedor de IA', ['status' => $response->status()]);
-            throw new RuntimeException('El servicio de IA no respondió correctamente. Intenta de nuevo en unos minutos.');
+            Log::warning('Falla del proveedor de IA', [
+                'status' => $response->status(),
+                'model' => $model,
+                'body' => mb_substr($response->body(), 0, 400),
+            ]);
+
+            $busy = in_array($response->status(), [429, 503]);
+
+            throw new RuntimeException(
+                $busy
+                    ? 'El servicio de IA está saturado en este momento. Intenta de nuevo en un minuto.'
+                    : 'El servicio de IA no respondió correctamente. Intenta de nuevo en unos minutos.'
+            );
         }
 
         $text = $provider === 'gemini'
@@ -94,11 +106,7 @@ class AiAssistant
         if (! $text) {
             throw new RuntimeException('El servicio de IA devolvió una respuesta vacía.');
         }
-Log::warning('Falla del proveedor de IA', [
-    'status' => $response->status(),
-    'model' => $model,
-    'body' => mb_substr($response->body(), 0, 400),
-]);
+
         return trim($text);
     }
 }
