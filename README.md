@@ -116,7 +116,7 @@ Seis tablas con migraciones, llaves foráneas reales e índices: `users`, `branc
 - El servidor de Railway usa el servidor integrado de PHP (`php -S`), que atiende una petición a la vez; es suficiente para la prueba, no para producción real.
 - Railway tiene un modo de protección ("Under Attack Mode") que bloquea la API con una verificación de navegador; debe permanecer desactivado.
 - Gemini en plan gratuito puede responder "saturado" (503) en horas pico y el asistente tarda entre 15 y 40 s.
-- **Pendiente:** mensajes de validación del backend en español, nombres de productos más realistas, caché de reportes, pruebas automatizadas (PHPUnit/Pest), Docker Compose y modo oscuro.
+- **Pendiente:** nombres de productos más realistas, Docker Compose y modo oscuro.
 
 ## Uso de IA
 
@@ -128,4 +128,6 @@ La bitácora de prompts, errores y correcciones está en [`AI_LOG.md`](AI_LOG.md
 php artisan test
 ```
 
-Cubren: cálculo de IVA y descuento de stock, venta sin stock, cancelación (solo admin, regresa el stock), reportes sin ventas canceladas, alcance por rol del vendedor y bloqueo del login tras 5 intentos. Corren en SQLite en memoria, sin tocar la base de datos de desarrollo.
+- **Cubren: cálculo de IVA y descuento de stock, venta sin stock, cancelación (solo admin, regresa el stock), reportes sin ventas canceladas, alcance por rol del vendedor y bloqueo del login tras 5 intentos. Corren en SQLite en memoria, sin tocar la base de datos de desarrollo.
+
+- **Caché de reportes:** vendedores y margen se guardan 5 minutos; la clave incluye usuario, rol y filtros (un vendedor nunca ve datos ajenos) y se vacía al registrar o cancelar una venta.
