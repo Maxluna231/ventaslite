@@ -179,7 +179,8 @@ public function sellers(Request $request)
                 'total' => round((float) $r->total, 2),
                 'sales_count' => (int) $r->sales_count,
                 'average_ticket' => round((float) $r->average_ticket, 2),
-            ]);
+            ])
+            ->all();
     });
 
     return response()->json($rows);
@@ -239,7 +240,8 @@ public function sellers(Request $request)
                     'gross_profit' => round($profit, 2),
                     'margin_percent' => $revenue > 0 ? round($profit / $revenue * 100, 1) : null,
                 ];
-            });
+            })
+            ->all();
     });
 
     return response()->json($rows);
