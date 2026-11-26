@@ -35,3 +35,23 @@ export async function api(path, { method = 'GET', body } = {}) {
 
   return data
 }
+
+export async function download(path, filename) {
+  const token = getToken()
+
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.message || 'No se pudo exportar el reporte.')
+  }
+
+  const url = URL.createObjectURL(await res.blob())
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}

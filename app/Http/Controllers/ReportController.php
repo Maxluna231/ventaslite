@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Branch;
+use App\Models\Category;
+
 
 class ReportController extends Controller
 {
@@ -174,31 +177,36 @@ class ReportController extends Controller
     }
 
     public function branchCategory(Request $request)
-    {
-        $this->validateFilters($request);
-        [$from, $end] = $this->period($request);
+{
+    $this->validateFilters($request);
+    [$from, $end] = $this->period($request);
 
-        $rows = $this->sales($request, $from, $end)
-            ->join('sale_items', 'sale_items.sale_id', '=', 'sales.id')
-            ->join('products', 'products.id', '=', 'sale_items.product_id')
-            ->join('categories', 'categories.id', '=', 'products.category_id')
-            ->join('branches', 'branches.id', '=', 'sales.branch_id')
-            ->groupBy('branches.id', 'branches.name', 'categories.id', 'categories.name')
-            ->selectRaw('branches.name AS branch, categories.name AS category, SUM(sale_items.line_total) AS amount')
-            ->get();
+    $rows = $this->sales($request, $from, $end)
+        ->join('sale_items', 'sale_items.sale_id', '=', 'sales.id')
+        ->join('products', 'products.id', '=', 'sale_items.product_id')
+        ->join('categories', 'categories.id', '=', 'products.category_id')
+        ->join('branches', 'branches.id', '=', 'sales.branch_id')
+        ->groupBy('branches.id', 'branches.name', 'categories.id', 'categories.name')
+        ->selectRaw('branches.name AS branch, categories.name AS category, SUM(sale_items.line_total) AS amount')
+        ->get();
 
-        $categories = $rows->pluck('category')->unique()->sort()->values();
+    // Todas las categorías y sucursales, aunque no tengan ventas en el periodo
+    $categories = Category::orderBy('name')->pluck('name');
+    $branches = Branch::orderBy('name')
+        ->when($request->filled('branch_id'), fn ($q) => $q->where('id', $request->branch_id))
+        ->pluck('name');
 
-        $table = $rows->groupBy('branch')->map(function ($items, $branch) use ($categories) {
-            $byCategory = $items->pluck('amount', 'category');
-            $values = $categories->map(fn ($c) => round((float) ($byCategory[$c] ?? 0), 2))->all();
+    $byBranch = $rows->groupBy('branch');
 
-            return ['branch' => $branch, 'values' => $values, 'total' => round(array_sum($values), 2)];
-        })->values();
+    $table = $branches->map(function ($branch) use ($byBranch, $categories) {
+        $byCategory = ($byBranch[$branch] ?? collect())->pluck('amount', 'category');
+        $values = $categories->map(fn ($c) => round((float) ($byCategory[$c] ?? 0), 2))->all();
 
-        return response()->json(['categories' => $categories, 'rows' => $table]);
-    }
+        return ['branch' => $branch, 'values' => $values, 'total' => round(array_sum($values), 2)];
+    })->sortByDesc('total')->values();
 
+    return response()->json(['categories' => $categories, 'rows' => $table]);
+}
     public function margin(Request $request)
     {
         $this->validateFilters($request);
