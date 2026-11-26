@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api'
 import { useAuth } from '../auth'
 import { dateTime, money } from '../format'
+import SaleDetail from '../components/SaleDetail'
+import NewSale from '../components/NewSale'
 
 const EMPTY = { from: '', to: '', branch_id: '', user_id: '', status: '' }
 
@@ -26,6 +28,9 @@ export default function Sales() {
   const [error, setError] = useState('')
   const [branches, setBranches] = useState([])
   const [sellers, setSellers] = useState([])
+  const [detailId, setDetailId] = useState(null)
+  const [showNew, setShowNew] = useState(false)
+  const [notice, setNotice] = useState('')
 
   useEffect(() => {
     api('/branches').then(setBranches).catch(() => {})
@@ -64,16 +69,40 @@ export default function Sales() {
     setPage(1)
   }
 
+  function created(sale) {
+    setShowNew(false)
+    setNotice(`Venta ${sale.folio} registrada correctamente.`)
+    if (page !== 1) setPage(1)
+    else load()
+  }
+
+  function changed(message) {
+    setDetailId(null)
+    setNotice(message)
+    load()
+  }
+
   const rows = result?.data ?? []
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-gray-900">Ventas</h1>
-        <button type="button" disabled className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white opacity-60">
+        <button
+          type="button"
+          onClick={() => setShowNew(true)}
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
+        >
           + Nueva venta
         </button>
       </div>
+
+      {notice && (
+        <div role="status" className="mb-4 flex items-center justify-between rounded-lg border border-green-600 bg-green-50 px-3 py-2 text-sm text-green-800">
+          <span>{notice}</span>
+          <button type="button" onClick={() => setNotice('')} aria-label="Cerrar aviso" className="font-semibold">✕</button>
+        </div>
+      )}
 
       <form onSubmit={apply} className="mb-4 grid gap-3 rounded-xl bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
         <div>
@@ -131,7 +160,7 @@ export default function Sales() {
         )}
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px] text-left text-sm">
+          <table className="w-full min-w-[900px] text-left text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-600">
               <tr>
                 <th className="px-4 py-3">Folio</th>
@@ -142,13 +171,14 @@ export default function Sales() {
                 <th className="px-4 py-3">Método</th>
                 <th className="px-4 py-3">Estatus</th>
                 <th className="px-4 py-3 text-right">Total</th>
+                <th className="px-4 py-3"><span className="sr-only">Acciones</span></th>
               </tr>
             </thead>
             <tbody>
               {loading &&
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="border-t border-gray-100">
-                    <td colSpan={8} className="px-4 py-3">
+                    <td colSpan={9} className="px-4 py-3">
                       <div className="h-4 animate-pulse rounded bg-gray-200" />
                     </td>
                   </tr>
@@ -156,7 +186,7 @@ export default function Sales() {
 
               {!loading && !error && rows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-gray-600">
+                  <td colSpan={9} className="px-4 py-10 text-center text-gray-600">
                     No hay ventas en este periodo
                   </td>
                 </tr>
@@ -165,14 +195,23 @@ export default function Sales() {
               {!loading &&
                 rows.map((s) => (
                   <tr key={s.id} className="border-t border-gray-100">
-                    <td className="px-4 py-3 font-semibold text-gray-900">{s.folio}</td>
-                    <td className="px-4 py-3 text-gray-700">{dateTime(s.sold_at)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 font-semibold text-gray-900">{s.folio}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-gray-700">{dateTime(s.sold_at)}</td>
                     <td className="px-4 py-3 text-gray-700">{s.customer_name}</td>
                     <td className="px-4 py-3 text-gray-700">{s.branch?.name}</td>
                     <td className="px-4 py-3 text-gray-700">{s.user?.name}</td>
                     <td className="px-4 py-3 capitalize text-gray-700">{s.payment_method}</td>
                     <td className="px-4 py-3"><Badge status={s.status} /></td>
-                    <td className="px-4 py-3 text-right font-medium text-gray-900">{money(s.total)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-gray-900">{money(s.total)}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setDetailId(s.id)}
+                        className="font-medium text-brand hover:text-brand-dark"
+                      >
+                        Ver
+                      </button>
+                    </td>
                   </tr>
                 ))}
             </tbody>
@@ -208,6 +247,11 @@ export default function Sales() {
           </div>
         )}
       </div>
+
+      {detailId && (
+        <SaleDetail id={detailId} onClose={() => setDetailId(null)} onChanged={changed} />
+      )}
+      {showNew && <NewSale onClose={() => setShowNew(false)} onCreated={created} />}
     </div>
   )
 }
