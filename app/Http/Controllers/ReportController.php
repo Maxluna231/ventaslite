@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 class ReportController extends Controller
 {
 
-
     private function validateFilters(Request $request): void
     {
         $request->validate([
@@ -232,6 +231,7 @@ class ReportController extends Controller
     {
         $methods = [
             'monthly' => 'monthly',
+            'dashboard' => 'dashboard',
             'top-products' => 'topProducts',
             'sellers' => 'sellers',
             'branch-category' => 'branchCategory',
@@ -243,16 +243,27 @@ class ReportController extends Controller
         // Reutiliza el reporte: mismos filtros, mismo alcance por rol
         $data = $this->{$methods[$report]}($request)->getData(true);
 
-        if ($report === 'branch-category') {
-            $header = array_merge(['Sucursal'], $data['categories'], ['Total']);
-            $rows = array_map(
-                fn ($r) => array_merge([$r['branch']], $r['values'], [$r['total']]),
-                $data['rows']
-            );
-        } else {
-            $header = $data ? array_keys($data[0]) : [];
-            $rows = array_map('array_values', $data);
-        }
+       if ($report === 'dashboard') {
+    $c = $data['current'];
+    $p = $data['previous'];
+    $ch = $data['change_percent'];
+
+    $header = ['Métrica', 'Periodo actual', 'Periodo anterior', 'Cambio %'];
+    $rows = [
+        ['Ventas totales', $c['total'], $p['total'], $ch['total']],
+        ['Número de ventas', $c['sales_count'], $p['sales_count'], $ch['sales_count']],
+        ['Ticket promedio', $c['average_ticket'], $p['average_ticket'], $ch['average_ticket']],
+    ];
+} elseif ($report === 'branch-category') {
+    $header = array_merge(['Sucursal'], $data['categories'], ['Total']);
+    $rows = array_map(
+        fn ($r) => array_merge([$r['branch']], $r['values'], [$r['total']]),
+        $data['rows']
+    );
+} else {
+    $header = $data ? array_keys($data[0]) : [];
+    $rows = array_map('array_values', $data);
+}
 
         $filename = "reporte-{$report}-" . now()->format('Ymd-His') . '.csv';
 
