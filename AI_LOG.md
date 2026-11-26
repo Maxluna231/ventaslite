@@ -1,4 +1,4 @@
-# Bitácora de IA
+# Bitacora de IA
 
 Herramienta principal: Claude (chat), usado como apoyo durante todo el desarrollo. El asistente dentro de la aplicacion usa Gemini (Google).
 
