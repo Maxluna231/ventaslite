@@ -86,72 +86,7 @@ export default function Sales() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-gray-900">Ventas</h1>
-        <button
-          type="button"
-          onClick={() => setShowNew(true)}
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
-        >
-          + Nueva venta
-        </button>
-      </div>
-
-      {notice && (
-        <div role="status" className="mb-4 flex items-center justify-between rounded-lg border border-green-600 bg-green-50 px-3 py-2 text-sm text-green-800">
-          <span>{notice}</span>
-          <button type="button" onClick={() => setNotice('')} aria-label="Cerrar aviso" className="font-semibold">✕</button>
-        </div>
-      )}
-
-      <form onSubmit={apply} className="mb-4 grid gap-3 rounded-xl bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
-        <div>
-          <label htmlFor="from" className="mb-1 block text-xs font-medium text-gray-700">Desde</label>
-          <input id="from" name="from" type="date" value={form.from} onChange={change} className={field} />
-        </div>
-        <div>
-          <label htmlFor="to" className="mb-1 block text-xs font-medium text-gray-700">Hasta</label>
-          <input id="to" name="to" type="date" value={form.to} onChange={change} className={field} />
-        </div>
-        <div>
-          <label htmlFor="branch_id" className="mb-1 block text-xs font-medium text-gray-700">Sucursal</label>
-          <select id="branch_id" name="branch_id" value={form.branch_id} onChange={change} className={field}>
-            <option value="">Todas</option>
-            {branches.map((b) => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
-          </select>
-        </div>
-        {isAdmin && (
-          <div>
-            <label htmlFor="user_id" className="mb-1 block text-xs font-medium text-gray-700">Vendedor</label>
-            <select id="user_id" name="user_id" value={form.user_id} onChange={change} className={field}>
-              <option value="">Todos</option>
-              {sellers.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-        <div>
-          <label htmlFor="status" className="mb-1 block text-xs font-medium text-gray-700">Estatus</label>
-          <select id="status" name="status" value={form.status} onChange={change} className={field}>
-            <option value="">Todos</option>
-            <option value="pagada">Pagada</option>
-            <option value="cancelada">Cancelada</option>
-          </select>
-        </div>
-        <div className="flex items-end gap-2">
-          <button type="submit" className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
-            Filtrar
-          </button>
-          <button type="button" onClick={clear} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100">
-            Limpiar
-          </button>
-        </div>
-      </form>
-
-      <div className="rounded-xl bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl bg-white shadow-sm">
         {error && (
           <div role="alert" className="m-4 flex items-center justify-between rounded-lg border border-red-600 bg-red-50 px-3 py-2 text-sm text-red-800">
             <span>{error}</span>
@@ -247,7 +182,7 @@ export default function Sales() {
           </div>
         )}
       </div>
-
+      
       {detailId && (
         <SaleDetail id={detailId} onClose={() => setDetailId(null)} onChanged={changed} />
       )}

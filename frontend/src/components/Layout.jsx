@@ -18,7 +18,7 @@ export default function Layout() {
     }`
 
   return (
-    <div className="min-h-screen bg-gray-100 md:flex">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gray-100 md:flex">
       <aside
         className={`${open ? 'block' : 'hidden'} w-full border-r border-gray-200 bg-white p-4 md:block md:w-56`}
       >
@@ -32,7 +32,7 @@ export default function Layout() {
         </nav>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex w-full min-w-0 flex-1 flex-col overflow-x-hidden">
         <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
           <button
             type="button"
