@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\Request;
@@ -19,6 +18,12 @@ class SaleController extends Controller
             'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'status' => ['nullable', 'in:pagada,cancelada'],
+        ], [], [
+            'from' => 'fecha inicial',
+            'to' => 'fecha final',
+            'branch_id' => 'sucursal',
+            'user_id' => 'vendedor',
+            'status' => 'estatus',
         ]);
 
         $user = $request->user();
@@ -58,6 +63,13 @@ class SaleController extends Controller
             'items' => ['required', 'array', 'min:1', 'max:6'],
             'items.*.product_id' => ['required', 'integer', 'distinct', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:100'],
+        ], [], [
+            'branch_id' => 'sucursal',
+            'customer_name' => 'cliente',
+            'payment_method' => 'método de pago',
+            'items' => 'productos',
+            'items.*.product_id' => 'producto',
+            'items.*.quantity' => 'cantidad',
         ]);
 
         $sale = DB::transaction(function () use ($data, $request) {
