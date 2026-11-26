@@ -85,8 +85,8 @@ export default function Sales() {
   const rows = result?.data ?? []
 
   return (
-    <div>
-            <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+    <div className="w-full min-w-0 max-w-full">
+            <div className="w-full min-w-0 overflow-hidden rounded-xl bg-white shadow-sm">
         {error && (
           <div role="alert" className="m-4 flex items-center justify-between rounded-lg border border-red-600 bg-red-50 px-3 py-2 text-sm text-red-800">
             <span>{error}</span>
@@ -182,7 +182,7 @@ export default function Sales() {
           </div>
         )}
       </div>
-      
+
       {detailId && (
         <SaleDetail id={detailId} onClose={() => setDetailId(null)} onChanged={changed} />
       )}

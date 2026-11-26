@@ -20,7 +20,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-gray-100 md:flex">
       <aside
-        className={`${open ? 'block' : 'hidden'} w-full border-r border-gray-200 bg-white p-4 md:block md:w-56`}
+        className={`${open ? 'block' : 'hidden'} w-full border-r border-gray-200 bg-white p-4 md:block md:w-56 md:shrink-0`}
       >
         <p className="mb-6 text-xl font-bold text-brand">VentasLite</p>
         <nav aria-label="Principal" className="space-y-1">
@@ -57,7 +57,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6">
+        <main className="w-full min-w-0 max-w-full flex-1 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
