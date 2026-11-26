@@ -2,7 +2,7 @@
 
 Mini sistema de ventas para una distribuidora: login con roles, catálogo, mas de 2,000 ventas sembradas, reportes con SQL agregado y un asistente de IA.
 
-## Demo en línea
+## Demo en linea
 
 | Parte | URL |
 |---|---|
@@ -13,7 +13,7 @@ Mini sistema de ventas para una distribuidora: login con roles, catálogo, mas d
 
 ### Credenciales de prueba
 
-| Rol | Correo | Contraseña |
+| Rol | Correo | Contrasena |
 |---|---|---|
 | Administrador | `admin@ventaslite.test` | `password` |
 | Vendedor | `vendedor1@ventaslite.test` a `vendedor8@ventaslite.test` | `password` |
@@ -72,7 +72,7 @@ Ningún secreto está en el repositorio. Ver `.env.example` y `frontend/.env.exa
 ## Funcionalidades
 
 - **Login y roles:** token Sanctum, logout que invalida el token, bloqueo tras 5 intentos fallidos por minuto. El vendedor solo ve y reporta sus propias ventas, validado en el backend.
-- **Ventas:** listado paginado en servidor (20 por página) con filtros de fechas, sucursal, vendedor y estatus; detalle; registrar venta (descuenta stock en una transaccion); cancelar (solo admin, regresa el stock).
+- **Ventas:** listado paginado en servidor (20 por pagina) con filtros de fechas, sucursal, vendedor y estatus; detalle; registrar venta (descuenta stock en una transaccion); cancelar (solo admin, regresa el stock).
 - **Reportes** (SQL agregado en el backend, las ventas canceladas no cuentan): dashboard con cambio contra el periodo anterior, ventas por mes (12 meses), top 10 de productos por unidades o importe, ranking de vendedores, sucursal × categoría, margen por categoria y exportación a CSV.
 - **Asistente de IA:** pregunta libre y "Resumen ejecutivo" sobre el periodo filtrado.
 
@@ -89,34 +89,34 @@ Seis tablas con migraciones, llaves foráneas reales e índices: `users`, `branc
 - **Dinero:** `DECIMAL(12,2)`, nunca `FLOAT`; los cálculos se hacen en centavos enteros y se convierten al final.
 - **`unit_price` en `sale_items`:** el precio del producto puede cambiar despues.
 - **Cálculo en el servidor:** el cliente solo manda producto y cantidad; precios, IVA y total salen de la base. La vista previa del formulario es solo para visualizar.
-- **Concurrencia:** el registro de ventas bloquea las filas de producto (`lockForUpdate`, en orden de id) dentro de una transacción.
-- **Seeders rápidos e idempotentes:** inserciones por lote en una transacción; catálogos con `firstOrCreate`.
+- **Concurrencia:** el registro de ventas bloquea las filas de producto (`lockForUpdate`, en orden de id) dentro de una transaccion.
+- **Seeders rápidos e idempotentes:** inserciones por lote en una transaccion; catalogos con `firstOrCreate`.
 - **Nombres:** Faker no incluye `es_MX`, asi que se usó `es_ES`.
 - **Reportes:** todos parten de una sola consulta base que excluye canceladas y aplica el alcance por rol. La tabla sucursal × categoría incluye sucursales y categorías sin ventas (con 0).
 - **Periodo por defecto:** si no se eligen fechas, los últimos 30 dias. "Ventas por mes" siempre muestra los ultimos 12 meses y solo respeta sucursal y rol.
-- **Importes:** los totales de ventas incluyen IVA; sucursal × categoría, top de productos y margen usan importes sin IVA.
+- **Importes:** los totales de ventas incluyen IVA; sucursal × categoria, top de productos y margen usan importes sin IVA.
 - **CSV:** se genera reutilizando los mismos reportes (mismos filtros y mismo alcance por rol), con BOM UTF-8 para que Excel muestre bien los acentos.
 
 ## Asistente de IA
 
 - El frontend nunca llama al modelo directamente: pasa por el backend.
 - El backend arma el contexto con **datos agregados** (resumen, sucursales, vendedores, margen), nunca con tablas completas, y respeta el rol del usuario.
-- **El modelo no genera SQL ni se ejecuta nada que provenga de él.** Todas las consultas son fijas y parametrizadas, así que no hay superficie de inyección y no hizo falta una lista blanca. El prompt de sistema además le prohíbe generar consultas o cambiar sus reglas.
+- **El modelo no genera SQL ni se ejecuta nada que provenga de él.** Todas las consultas son fijas y parametrizadas, asi que no hay superficie de inyeccion y no hizo falta una lista blanca. El prompt de sistema además le prohibe generar consultas o cambiar sus reglas.
 - Si no hay key o el proveedor falla o está saturado, la app sigue funcionando y muestra un mensaje en español (HTTP 503).
 
 
 ## Despliegue
 
 - **Backend en Railway:** servicio de GitHub mas un servicio MySQL. Variables de entorno configuradas en Railway. Comando de inicio: `php artisan migrate --force && php -S 0.0.0.0:$PORT -t public`.
-- **Frontend en Vercel:** carpeta raíz `frontend`. `frontend/vercel.json` reenvía `/api/*` a Railway (así el navegador solo habla con Vercel y no hay CORS) y redirige el resto a `index.html`.
-- **Asistente:** llama directo a Railway (`VITE_AI_URL`), porque Vercel corta los reenvíos de más de ~30 s y Gemini puede tardar más.
+- **Frontend en Vercel:** carpeta raíz `frontend`. `frontend/vercel.json` reenvia `/api/*` a Railway (así el navegador solo habla con Vercel y no hay CORS) y redirige el resto a `index.html`.
+- **Asistente:** llama directo a Railway (`VITE_AI_URL`), porque Vercel corta los reenvios de mas de ~30 s y Gemini puede tardar mas.
 
 ## Limitaciones conocidas y pendientes
 
-- El servidor de Railway usa el servidor integrado de PHP (`php -S`), que atiende una petición a la vez; es suficiente para la prueba, no para producción real.
+- El servidor de Railway usa el servidor integrado de PHP (`php -S`), que atiende una peticion a la vez; es suficiente para la prueba, no para produccion real.
 - Railway tiene un modo de protección ("Under Attack Mode") que bloquea la API con una verificación de navegador; debe permanecer desactivado.
 - Gemini en plan gratuito puede responder "saturado" (503) en horas pico y el asistente tarda entre 15 y 40 s.
-- **Pendiente:** nombres de productos más realistas, Docker Compose y modo oscuro.
+- **Pendiente:** nombres de productos mas realistas, Docker Compose y modo oscuro.
 
 ## Uso de IA
 
@@ -128,6 +128,6 @@ La bitácora de prompts, errores y correcciones está en [`AI_LOG.md`](AI_LOG.md
 php artisan test
 ```
 
-- **Cubren: cálculo de IVA y descuento de stock, venta sin stock, cancelación (solo admin, regresa el stock), reportes sin ventas canceladas, alcance por rol del vendedor y bloqueo del login tras 5 intentos. Corren en SQLite en memoria, sin tocar la base de datos de desarrollo.
+- **Cubren: cálculo de IVA y descuento de stock, venta sin stock, cancelacion (solo admin, regresa el stock), reportes sin ventas canceladas, alcance por rol del vendedor y bloqueo del login tras 5 intentos. Corren en SQLite en memoria, sin tocar la base de datos de desarrollo.
 
 - **Caché de reportes:** vendedores y margen se guardan 5 minutos; la clave incluye usuario, rol y filtros (un vendedor nunca ve datos ajenos) y se vacía al registrar o cancelar una venta.
