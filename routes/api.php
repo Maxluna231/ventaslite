@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
-
+use App\Http\Controllers\AiController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/margin', [ReportController::class, 'margin']);
     Route::get('/reports/{report}/export', [ReportController::class, 'export']);
     
+    //IA
+    Route::post('/ai/ask', [AiController::class, 'ask'])->middleware('throttle:20,1');
+    Route::post('/ai/summary', [AiController::class, 'summary'])->middleware('throttle:20,1');
 });
 
 Route::get('/user', function (Request $request) {

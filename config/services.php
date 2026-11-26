@@ -34,5 +34,15 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+'ai' => [
+    'provider' => env('AI_PROVIDER', 'gemini'),
+    'key' => env('AI_API_KEY'),
+    'model' => env('AI_MODEL'),
+    'timeout' => 60,
+],
 
+'generationConfig' => [
+    'maxOutputTokens' => 2048,
+    'thinkingConfig' => ['thinkingBudget' => 0],
+],
 ];
