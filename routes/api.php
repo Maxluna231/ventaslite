@@ -9,12 +9,15 @@ use App\Http\Controllers\AuthController;
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
     // api de ventas
     Route::get('/sales', [SaleController::class, 'index']);
     Route::get('/sales/{sale}', [SaleController::class, 'show']);
+    Route::post('/sales', [SaleController::class, 'store']);
+    Route::post('/sales/{sale}/cancel', [SaleController::class, 'cancel']);
     
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
+    
 });
 
 Route::get('/user', function (Request $request) {
