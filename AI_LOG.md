@@ -2,7 +2,7 @@
 
 Herramienta principal: Claude (chat), usado como apoyo durante todo el desarrollo. El asistente dentro de la aplicacion usa Gemini (Google).
 
-| # | Herramienta | Qué pedi (resumen) | Que me dio | Que estaba mal o cambie | Por que |
+| # | Herramienta | Que pedi (resumen) | Que me dio | Que estaba mal o cambie | Por que |
 |---|---|---|---|---|---|
 | 1 | Claude | Instalar Laravel y MySQL en Mac | Homebrew instaló MySQL 26.10 sobre una carpeta de datos creada con la 9.3 y no arrancaba | Movi la carpeta de datos vieja, instale `mysql@8.4` y cree la base desde cero | La prueba pide MySQL 8, y MySQL no permite saltar entre versiones tan distintas |
 | 2 | Claude | Rutas de login con Sanctum | Las rutas quedaron en `routes/web.php` y `/api/login` daba 404 | Las movi a `routes/api.php` | `web.php` usa sesión y CSRF; `api.php` agrega el prefijo `/api` y no usa sesion |
