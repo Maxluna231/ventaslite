@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'vendedor'])->default('vendedor'); // <- existe tabla de usuarios por defecto se agrega una linea de acuerdo a la consigna
             $table->rememberToken();
             $table->timestamps();
         });
