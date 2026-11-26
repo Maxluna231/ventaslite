@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Category;
-
+use Illuminate\Support\Facades\Cache;
 
 class ReportController extends Controller
 {
@@ -68,7 +68,14 @@ class ReportController extends Controller
     {
         return $previous > 0 ? round(($current - $previous) / $previous * 100, 1) : null;
     }
+      /** Guarda el resultado 5 minutos; la clave incluye usuario, rol y filtros. */
+      private function cached(Request $request, string $name, callable $callback)
+    {
+    $user = $request->user();
+    $key = 'reports:' . $name . ':' . $user->id . ':' . $user->role . ':' . md5(json_encode($request->query()));
 
+    return Cache::remember($key, now()->addMinutes(5), $callback);
+}
     public function dashboard(Request $request)
     {
         $this->validateFilters($request);
@@ -154,12 +161,13 @@ class ReportController extends Controller
         return response()->json($rows);
     }
 
-    public function sellers(Request $request)
-    {
-        $this->validateFilters($request);
-        [$from, $end] = $this->period($request);
+public function sellers(Request $request)
+{
+    $this->validateFilters($request);
+    [$from, $end] = $this->period($request);
 
-        $rows = $this->sales($request, $from, $end)
+    $rows = $this->cached($request, 'sellers', function () use ($request, $from, $end) {
+        return $this->sales($request, $from, $end)
             ->join('users', 'users.id', '=', 'sales.user_id')
             ->groupBy('users.id', 'users.name')
             ->selectRaw('users.id, users.name, SUM(sales.total) AS total, COUNT(*) AS sales_count, AVG(sales.total) AS average_ticket')
@@ -172,10 +180,10 @@ class ReportController extends Controller
                 'sales_count' => (int) $r->sales_count,
                 'average_ticket' => round((float) $r->average_ticket, 2),
             ]);
+    });
 
-        return response()->json($rows);
-    }
-
+    return response()->json($rows);
+}
     public function branchCategory(Request $request)
 {
     $this->validateFilters($request);
@@ -208,11 +216,12 @@ class ReportController extends Controller
     return response()->json(['categories' => $categories, 'rows' => $table]);
 }
     public function margin(Request $request)
-    {
-        $this->validateFilters($request);
-        [$from, $end] = $this->period($request);
+{
+    $this->validateFilters($request);
+    [$from, $end] = $this->period($request);
 
-        $rows = $this->sales($request, $from, $end)
+    $rows = $this->cached($request, 'margin', function () use ($request, $from, $end) {
+        return $this->sales($request, $from, $end)
             ->join('sale_items', 'sale_items.sale_id', '=', 'sales.id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
             ->join('categories', 'categories.id', '=', 'products.category_id')
@@ -231,10 +240,10 @@ class ReportController extends Controller
                     'margin_percent' => $revenue > 0 ? round($profit / $revenue * 100, 1) : null,
                 ];
             });
+    });
 
-        return response()->json($rows);
-    }
-
+    return response()->json($rows);
+}
     public function export(Request $request, string $report)
     {
         $methods = [

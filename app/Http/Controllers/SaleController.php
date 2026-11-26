@@ -7,6 +7,8 @@ use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
+
 
 class SaleController extends Controller
 {
@@ -54,7 +56,7 @@ class SaleController extends Controller
         );
     }
 
-    public function store(Request $request)
+       public function store(Request $request)
     {
         $data = $request->validate([
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
@@ -131,6 +133,9 @@ class SaleController extends Controller
             return $sale;
         });
 
+        // La transacción ya se confirmó: ahora sí se vacía la caché de reportes
+        Cache::flush();
+
         return response()->json(
             $sale->load(['branch:id,name,city', 'items.product:id,sku,name']),
             201
@@ -154,7 +159,7 @@ class SaleController extends Controller
 
             $sale->update(['status' => 'cancelada']);
         });
-
+        Cache::flush();
         return response()->json(['message' => 'Venta cancelada y stock regresado.']);
     }
 }
