@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts'
 import { api } from '../api'
+import { useAuth } from '../auth'
 import { money } from '../format'
 
 const EMPTY = { from: '', to: '', branch_id: '' }
@@ -24,6 +25,13 @@ const monthLabel = (ym) => {
 }
 
 const shortDate = (iso) => iso.split('-').reverse().join('/')
+
+function greeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Buenos días'
+  if (hour < 19) return 'Buenas tardes'
+  return 'Buenas noches'
+}
 
 function Change({ value }) {
   if (value === null || value === undefined) {
@@ -55,6 +63,9 @@ function Card({ title, value, change, loading }) {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth()
+  const firstName = user?.name?.split(' ')[0] ?? ''
+
   const [form, setForm] = useState(EMPTY)
   const [filters, setFilters] = useState(EMPTY)
   const [branches, setBranches] = useState([])
@@ -107,8 +118,13 @@ export default function Dashboard() {
   const chartEmpty = monthly.every((m) => m.total === 0)
 
   return (
-    <div>
-      <h1 className="mb-4 text-2xl font-semibold text-gray-900">Dashboard</h1>
+    <div className="w-full min-w-0 max-w-full">
+      <div className="mb-4">
+        <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-600">
+          {greeting()}, {firstName}. Aqui tienes el resumen de tus ventas.
+        </p>
+      </div>
 
       <form onSubmit={apply} className="mb-4 grid gap-3 rounded-xl bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
         <div>
@@ -178,7 +194,7 @@ export default function Dashboard() {
         <h2 className="text-lg font-semibold text-gray-900">Ventas de los últimos 12 meses</h2>
         <p className="text-sm text-gray-600">Ingresos mensuales en pesos mexicanos (MXN, IVA incluido)</p>
 
-        <div className="mt-4 h-80">
+        <div className="mt-4 h-80 w-full min-w-0">
           {loading ? (
             <div className="h-full animate-pulse rounded bg-gray-200" />
           ) : chartEmpty ? (

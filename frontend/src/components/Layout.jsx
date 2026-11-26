@@ -10,22 +10,29 @@ const links = [
 
 export default function Layout() {
   const { user, logout } = useAuth()
-  const [open, setOpen] = useState(false)
+  // En escritorio el menú arranca abierto; en celular, cerrado
+  const [open, setOpen] = useState(() => window.innerWidth >= 768)
 
   const linkClass = ({ isActive }) =>
     `block rounded-lg px-3 py-2 text-sm font-medium ${
       isActive ? 'bg-brand text-white' : 'text-gray-700 hover:bg-gray-200'
     }`
 
+  // En celular, al elegir una opción el menú se cierra
+  const closeOnMobile = () => {
+    if (window.innerWidth < 768) setOpen(false)
+  }
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-gray-100 md:flex">
       <aside
-        className={`${open ? 'block' : 'hidden'} w-full border-r border-gray-200 bg-white p-4 md:block md:w-56 md:shrink-0`}
+        id="menu-principal"
+        className={`${open ? 'block' : 'hidden'} w-full border-r border-gray-200 bg-white p-4 md:w-56 md:shrink-0`}
       >
         <p className="mb-6 text-xl font-bold text-brand">VentasLite</p>
         <nav aria-label="Principal" className="space-y-1">
           {links.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.end} className={linkClass} onClick={() => setOpen(false)}>
+            <NavLink key={l.to} to={l.to} end={l.end} className={linkClass} onClick={closeOnMobile}>
               {l.label}
             </NavLink>
           ))}
@@ -36,12 +43,13 @@ export default function Layout() {
         <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
           <button
             type="button"
-            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm md:hidden"
-            aria-label="Abrir menú"
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100"
+            aria-label={open ? 'Ocultar menú' : 'Mostrar menú'}
             aria-expanded={open}
+            aria-controls="menu-principal"
             onClick={() => setOpen((v) => !v)}
           >
-            Menú
+            ☰ Menú
           </button>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span className="text-gray-700">
