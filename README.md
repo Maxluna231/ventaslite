@@ -1,12 +1,12 @@
 # VentasLite
 
-Mini sistema de ventas para una distribuidora: login con roles, catálogo, mas de 2,000 ventas sembradas, reportes con SQL agregado y un asistente de IA.
+Mini sistema de ventas para una distribuidora: login con roles, catalogo, mas de 2,000 ventas sembradas, reportes con SQL agregado y un asistente de IA.
 
 ## Demo en linea
 
 | Parte | URL |
 |---|---|
-| Aplicación (frontend en Vercel) | https://ventaslite.vercel.app |
+| Aplicacion (frontend en Vercel) | https://ventaslite.vercel.app |
 | API (backend en Railway) | https://ventaslite-production.up.railway.app/api |
 | Video (3 a 5 min) | https://www.loom.com/share/0d2af3b5f8ba4c3ca3b383d969486e58 |
 | Wireframe | `docs/Figma`  https://www.figma.com/make/sWvTSSvk36g0yk24UuNZr8/Wireframe-de-Ventas?t=kjbXS2dvReyCsPxO-1|
